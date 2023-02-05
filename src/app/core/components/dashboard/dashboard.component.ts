@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {DashboardService} from "./dashboard.service";
+import {HealthCheckResponse} from "../../../shared/models/healthcheckResponse.model";
 
 @Component({
   selector: 'app-dashboard',
@@ -8,11 +9,12 @@ import {DashboardService} from "./dashboard.service";
 })
 export class DashboardComponent implements OnInit{
 
-  constructor(private _dashboadService: DashboardService) {
+  serviceStatuses!: HealthCheckResponse;
+
+  constructor(private _dashboardService: DashboardService) {
   }
   ngOnInit(): void {
-    this._dashboadService.getHealthCheck().subscribe(value => console.log(value))
+    this._dashboardService.getHealthCheck().subscribe(value => this.serviceStatuses = value);
   }
-
 
 }
