@@ -1,6 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {DashboardService} from "./dashboard.service";
-import {HealthCheckResponse} from "../../../shared/models/healthcheckResponse.model";
+import { Component, OnInit } from '@angular/core';
+import { HealthCheckResponse } from '../../../shared/models/healthcheckResponse.model';
+import { WebSocketShareService } from '../../../shared/services/WebSocketShareService';
+import { WebSocketAPI } from '../../../shared/services/WebSocketAPI';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -9,12 +11,21 @@ import {HealthCheckResponse} from "../../../shared/models/healthcheckResponse.mo
 })
 export class DashboardComponent implements OnInit{
 
-  serviceStatuses!: HealthCheckResponse;
+  dashBoardResponse!: HealthCheckResponse;
+  dashBoardTopic: string = '/dashboard'
 
-  constructor(private _dashboardService: DashboardService) {
+  constructor(private websocketService: WebSocketShareService,
+              private webSocketAPI: WebSocketAPI) {
+
   }
   ngOnInit(): void {
-    this._dashboardService.getHealthCheck().subscribe(value => this.serviceStatuses = value);
+    this.webSocketAPI._connect(this.dashBoardTopic);
+    this.onNewValueReceive();
   }
 
+  onNewValueReceive() {
+    this.websocketService.getNewValue().subscribe(resp => {
+      this.dashBoardResponse = resp;
+    });
+  }
 }
