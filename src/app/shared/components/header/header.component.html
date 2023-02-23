@@ -1,20 +1,11 @@
 <header>
   <nav class="navbar navbar-expand-lg navbar-light bg-white">
     <div class="container-fluid">
-      <div mdbDropdown class="dropdown">
-        <button
-          class="btn btn-primary dropdown-toggle"
-          type="button"
-          id="dropdownMenu2"
-          mdbDropdownToggle
-          aria-expanded="false"
-        >
-          Services
-        </button>
-        <ul mdbDropdownMenu class="dropdown-menu" aria-labelledby="dropdownMenu2">
-          <li><button class="dropdown-item" type="button">SQS</button></li>
-        </ul>
-      </div>
+      <button class="btn"
+              [ngClass]="isAllWorks ? 'btn-primary' : 'btn-danger'"
+              (click)="switchSideBarStatus()">
+        <i class="fas" [ngClass]="isAllWorks ? 'fa-bars' : 'fa-exclamation'"></i>
+      </button>
     </div>
   </nav>
 </header>

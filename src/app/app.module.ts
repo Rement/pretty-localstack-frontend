@@ -22,7 +22,7 @@ import { MdbTooltipModule } from 'mdb-angular-ui-kit/tooltip';
 import { MdbValidationModule } from 'mdb-angular-ui-kit/validation';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { UrlInterceptor } from './shared/interceptors/UrlInterceptor';
+import { UrlInterceptor } from './shared/interceptors/url-interceptor';
 
 @NgModule({
   declarations: [
