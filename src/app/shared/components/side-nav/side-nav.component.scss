@@ -1,0 +1,22 @@
+.sidebar {
+  position: relative;
+  width: 350px;
+  height: 100vh;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: row;
+}
+
+ul li {
+  padding: 10px 40px;
+}
+
+.navbar {
+  display: unset;
+}
+
+.list-group-item > span {
+  float: right;
+}
