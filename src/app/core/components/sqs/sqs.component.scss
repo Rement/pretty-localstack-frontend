@@ -1,0 +1,25 @@
+a.nav-link {
+  text-align: left!important;
+}
+
+.queue-info-box {
+  background-color: #0abab53d;
+  border-radius: 0.25rem;
+
+  & > div {
+    padding: 20px;
+  }
+}
+
+.attribute-name {
+  font-style: italic;
+  font-weight: bold;
+}
+
+.attribute-value {
+  float: right;
+}
+
+.list-group-item.ng-star-inserted {
+  background-color: #0abab53d;
+}

@@ -26,10 +26,12 @@ export class EventMessage<T> {
 
 export enum EventType {
   WS,
-  SERVICE
+  SERVICE,
+  HEALTH
 }
 
 export enum EventStatus {
   SUCCESS,
-  ERROR
+  ERROR,
+  PENDING
 }

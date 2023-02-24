@@ -1,1 +1,96 @@
-<p>sqs works!</p>
+<mdb-tabs [vertical]="true"
+          [pills]="true"
+          [navColumnClass]="'col-4'"
+          [contentColumnClass]="'col-8'"
+          (activeTabChange)="tabChanged($event)">
+  <mdb-tab *ngFor="let queue of queueList$ | async; index as i"
+           [title]="parseQueueName(queue)">
+    <div class="container-fluid" *ngTemplateOutlet="tabContent"></div>
+  </mdb-tab>
+</mdb-tabs>
+
+<ng-template #tabContent>
+  <div class="row m-t-10 queue-info-box" *ngIf="queueAttributes">
+    <div class="col-md-4">
+      <div><span class="attribute-name">Queue name:</span></div>
+      <div>{{activeQueue}}</div>
+    </div>
+    <div class="col-md-4">
+      <div class="row">
+        <div class="col-md-12">
+          <span class="attribute-name">ApproximateNumberOfMessages:</span>
+          <span class="attribute-value">{{queueAttributes?.ApproximateNumberOfMessages}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">ApproximateNumberOfMessagesDelayed:</span>
+          <span class="attribute-value">{{queueAttributes?.ApproximateNumberOfMessagesDelayed}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">ApproximateNumberOfMessagesNotVisible:</span>
+          <span class="attribute-value">{{queueAttributes.ApproximateNumberOfMessagesNotVisible}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="row">
+        <div class="col-md-12">
+          <span class="attribute-name">MaximumMessageSize:</span>
+          <span class="attribute-value">{{queueAttributes?.MaximumMessageSize}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">MessageRetentionPeriod:</span>
+          <span class="attribute-value">{{queueAttributes.MessageRetentionPeriod}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">VisibilityTimeout:</span>
+          <span class="attribute-value">{{queueAttributes.VisibilityTimeout}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row m-t-10 queue-info-box">
+    <form>
+      <div class="form-outline">
+        <textarea class="form-control" id="sendMessageTextArea" rows="4"
+                  appTextareaAutosize
+                  [minRows]="4"
+                  [maxRows]="40"
+                  [(ngModel)]="message"
+                  (ngModelChange)="cleanStatus($event)"
+                  [ngModelOptions]="{standalone: true}">
+        </textarea>
+        <label class="form-label" for="sendMessageTextArea">Message</label>
+      </div>
+      <div class="d-flex align-items-center m-b-10">
+        <button type="button" class="btn btn-primary"
+                (click)="sendMessage()">Send
+        </button>
+        <div class="m-l-10 success" *ngIf="sendStatus === 0"><i class="fas fa-check"></i> Success</div>
+        <div class="m-l-10 danger" *ngIf="sendStatus === 1"><i class="fas fa-times"></i> Fail</div>
+      </div>
+    </form>
+  </div>
+  <div class="row m-t-10 queue-info-box">
+    <div>
+      <button class="btn btn-primary"
+              (click)="receiveMessages()">
+        Receive messages
+      </button>
+    </div>
+    <div>
+      <ul class="list-group list-group-light">
+        <li class="list-group-item" *ngFor="let message of queueMessages">
+          <div class="col-md-12">
+            <span class="m-l-10 attribute-name">MessageId:</span>
+            <span class="m-l-10">{{message?.messageId}}</span>
+          </div>
+          <textarea class="form-control" id="receiveMessageTextArea"
+                    rows="5"
+                    readonly
+                    [ngModel]="message.body | json">
+          </textarea>
+        </li>
+      </ul>
+    </div>
+  </div>
+</ng-template>

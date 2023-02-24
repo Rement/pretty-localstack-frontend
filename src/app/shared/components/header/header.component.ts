@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MessageBusService } from '../../services/MessageBusService';
 import { EventType } from '../../models/event-message.model';
 import { Observable } from 'rxjs';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-header',
@@ -15,10 +16,11 @@ export class HeaderComponent implements OnInit {
 
   private _serviceEventListener$: Observable<any>;
 
-  constructor(private _messageBusService: MessageBusService) {
+  constructor(private _messageBusService: MessageBusService,
+              private readonly titleService: Title) {
     this.isExpandedProperty = 'isExpanded';
     this.isAllWorks = true;
-    this._serviceEventListener$ = this._messageBusService.observe(EventType.SERVICE);
+    this._serviceEventListener$ = this._messageBusService.observe(EventType.HEALTH);
   }
 
   ngOnInit(): void {

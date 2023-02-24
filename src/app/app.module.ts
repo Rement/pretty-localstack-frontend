@@ -52,7 +52,7 @@ import { UrlInterceptor } from './shared/interceptors/url-interceptor';
     HttpClientModule
   ],
   providers: [HttpClientModule,
-    { provide: HTTP_INTERCEPTORS, useClass: UrlInterceptor, multi: true },
+    {provide: HTTP_INTERCEPTORS, useClass: UrlInterceptor, multi: true},
   ],
   bootstrap: [AppComponent]
 })
