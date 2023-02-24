@@ -4,7 +4,7 @@ import { SQSComponent } from './core/components/sqs/sqs.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'sqs', pathMatch: 'full'},
-  {path: 'sqs', component: SQSComponent},
+  {path: 'sqs', component: SQSComponent, title: 'SQS'},
   {path: '**', redirectTo: 'sqs'}
 ];
 

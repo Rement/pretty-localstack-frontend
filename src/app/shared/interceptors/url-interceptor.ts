@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable()
 export class UrlInterceptor implements HttpInterceptor {
+
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(this.getRequestForApi(request));
   }

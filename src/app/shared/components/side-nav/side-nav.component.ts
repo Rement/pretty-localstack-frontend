@@ -51,7 +51,7 @@ export class SideNavComponent implements OnInit {
       this.parseWSEvent(eventMessage);
       const newStatus = this.isSQSUp && this.isServerUp;
       if (oldStatus !== newStatus) {
-        this._messageBusService.emit(EventType.SERVICE, newStatus);
+        this._messageBusService.emit(EventType.HEALTH, newStatus);
       }
     });
   }
@@ -67,7 +67,7 @@ export class SideNavComponent implements OnInit {
     if (parsedEvent.services == null) {
       this.isSQSUp = false;
     } else {
-      this.isSQSUp = parsedEvent.services.sqs === 'available';
+      this.isSQSUp = parsedEvent.services.sqs === 'available' || parsedEvent.services.sqs === 'running';
     }
   }
 
