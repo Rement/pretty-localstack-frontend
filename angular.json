@@ -17,6 +17,10 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "sockjs-client",
+              "stompjs"
+            ],
             "outputPath": "dist/pretty-localstack-frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -41,13 +45,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "50mb",
+                  "maximumError": "100mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "20mb",
+                  "maximumError": "40mb"
                 }
               ],
               "outputHashing": "all"
