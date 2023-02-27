@@ -1,13 +1,16 @@
-<mdb-tabs [vertical]="true"
-          [pills]="true"
-          [navColumnClass]="'col-4'"
-          [contentColumnClass]="'col-8'"
-          (activeTabChange)="tabChanged($event)">
-  <mdb-tab *ngFor="let queue of queueList$ | async; index as i"
-           [title]="parseQueueName(queue)">
-    <div class="container-fluid" *ngTemplateOutlet="tabContent"></div>
-  </mdb-tab>
-</mdb-tabs>
+<ng-container *ngIf="queueList$ | async as queueList; else loading">
+  <mdb-tabs [vertical]="true"
+            [pills]="true"
+            [navColumnClass]="'col-4'"
+            [contentColumnClass]="'col-8'"
+            (activeTabChange)="tabChanged($event)">
+    <mdb-tab *ngFor="let queue of queueList; index as i"
+             [title]="parseQueueName(queue)">
+      <div class="container-fluid" *ngTemplateOutlet="tabContent"></div>
+      <div *ngTemplateOutlet="loading"></div>
+    </mdb-tab>
+  </mdb-tabs>
+</ng-container>
 
 <ng-template #tabContent>
   <div class="row m-t-10 queue-info-box" *ngIf="queueAttributes">
@@ -91,6 +94,14 @@
           </textarea>
         </li>
       </ul>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #loading>
+  <div class="container-fluid m-t-10 navbar">
+    <div class="row">
+      Not queues found. Please, check localstack SQS status or apply sqs config (i.e. terraform)
     </div>
   </div>
 </ng-template>
