@@ -20,15 +20,17 @@ export class SQSComponent {
   public message: any;
   public sendStatus: EventStatus;
   public queueMessages: MessageModel[];
+  public newQueueName: string;
 
   constructor(private _sqsQueueService: SqsQueueService,
               private _sqsMessageService: SqsMessageService) {
-    this.queueList$ = this._sqsQueueService.getQueueList();
+    this.queueList$ = this.getQueueList();
     this.activeQueue = '';
     this.queueUrl = '';
     this.message = '';
     this.sendStatus = EventStatus.PENDING;
     this.queueMessages = [];
+    this.newQueueName = '';
   }
 
   tabChanged(event: MdbTabChange): void {
@@ -67,5 +69,29 @@ export class SQSComponent {
     if (event.length === 1) {
       this.sendStatus = EventStatus.PENDING;
     }
+  }
+
+  createQueue(queueName: string) {
+    this._sqsQueueService.createQueue(queueName).subscribe(() => {
+      this.queueList$ = this.getQueueList();
+      this.newQueueName = '';
+    });
+  }
+
+  deleteQueue(queueName: string) {
+    this._sqsQueueService.deleteQueue(this.queueUrl + queueName).subscribe(() => {
+      this.queueList$ = this.getQueueList();
+    });
+  }
+
+  deleteMessage(queueName: string, receiptHandler: string) {
+    this._sqsMessageService.deleteMessage(this.queueUrl + queueName, receiptHandler)
+      .subscribe(() => {
+        this.receiveMessages();
+      })
+  }
+
+  private getQueueList(): Observable<string[]> {
+    return this._sqsQueueService.getQueueList();
   }
 }
