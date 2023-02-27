@@ -9,12 +9,12 @@ import { MessageModel } from '../../shared/models/message.model';
 @Injectable({
   providedIn: 'root'
 })
-export class SqsService {
+export class SqsQueueService {
 
   public sqsBaseUrl: string;
 
   constructor(private http: HttpClient) {
-    this.sqsBaseUrl = '/sqs';
+    this.sqsBaseUrl = '/sqs/queue';
   }
 
   getQueueList(): Observable<string[]> {
@@ -26,18 +26,6 @@ export class SqsService {
     let params = new HttpParams();
     params = params.append('queryUrl', encodedUrl);
     return this.http.get<any>(this.sqsBaseUrl + `/queue`, {params: params})
-  }
-
-  getMessages(queueUrl: string): Observable<MessageModel[]> {
-    const encodedUrl: string = encodeURIComponent(queueUrl);
-    let params = new HttpParams();
-    params = params.append('queryUrl', encodedUrl);
-    return this.http.get<any>(this.sqsBaseUrl + `/receive`, {params: params})
-  }
-
-  sendMessage(queueUrl: string, message: string): Observable<SendMessageResponseModel> {
-    const messageRequest: MessageRequest = new MessageRequest(message, queueUrl);
-    return this.http.post<any>(this.sqsBaseUrl + `/send`, messageRequest);
   }
 
 }

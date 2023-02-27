@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { SqsService } from '../../services/sqs.service';
+import { SqsQueueService } from '../../services/sqs-queue.service';
 import { Observable } from 'rxjs';
 import { MdbTabChange } from 'mdb-angular-ui-kit/tabs/tabs.component';
 import { EventStatus } from '../../../shared/models/event-message.model';
 import { MessageModel } from '../../../shared/models/message.model';
+import { SqsMessageService } from '../../services/sqs-message.service';
 
 @Component({
   selector: 'app-sqs',
@@ -20,8 +21,9 @@ export class SQSComponent {
   public sendStatus: EventStatus;
   public queueMessages: MessageModel[];
 
-  constructor(private _sqsService: SqsService) {
-    this.queueList$ = this._sqsService.getQueueList();
+  constructor(private _sqsQueueService: SqsQueueService,
+              private _sqsMessageService: SqsMessageService) {
+    this.queueList$ = this._sqsQueueService.getQueueList();
     this.activeQueue = '';
     this.queueUrl = '';
     this.message = '';
@@ -31,7 +33,7 @@ export class SQSComponent {
 
   tabChanged(event: MdbTabChange): void {
     this.activeQueue = event.tab.title;
-    this._sqsService.getQueueInfo(this.queueUrl + this.activeQueue)
+    this._sqsQueueService.getQueueInfo(this.queueUrl + this.activeQueue)
       .subscribe(info => this.queueAttributes = info.attributes)
     this.message = '';
     this.sendStatus = EventStatus.PENDING;
@@ -39,18 +41,18 @@ export class SQSComponent {
   }
 
   parseQueueName(queue: string) {
-    this.queueUrl = queue.split('/').slice(0,4).join('/') + '/';
+    this.queueUrl = queue.split('/').slice(0, 4).join('/') + '/';
     return queue.split('/')[ 4 ];
   }
 
   receiveMessages() {
     const fullQueueUrl: string = this.queueUrl + this.activeQueue;
-    this._sqsService.getMessages(fullQueueUrl)
+    this._sqsMessageService.getMessages(fullQueueUrl)
       .subscribe((messages) => this.queueMessages.push(...messages));
   }
 
   sendMessage() {
-    this._sqsService.sendMessage(this.activeQueue, this.message)
+    this._sqsMessageService.sendMessage(this.activeQueue, this.message)
       .subscribe((result) => {
         if (result.sdkHttpMetadata.httpStatusCode === 200) {
           this.message = '';
