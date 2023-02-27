@@ -1,0 +1,15 @@
+server {
+
+      root /usr/share/nginx/html;
+      index index.html;
+
+      location /api/ {
+        proxy_pass http://${SERVER_HOST}:${SERVER_PORT}/;
+        proxy_set_header Accept application/json;
+        proxy_set_header Hello world;
+      }
+
+      location / {
+            try_files $uri $uri/ /index.html;
+      }
+}
