@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { SqsService } from '../../services/sqs.service';
 import { Observable } from 'rxjs';
 import { MdbTabChange } from 'mdb-angular-ui-kit/tabs/tabs.component';
@@ -10,7 +10,7 @@ import { MessageModel } from '../../../shared/models/message.model';
   templateUrl: './sqs.component.html',
   styleUrls: ['./sqs.component.scss']
 })
-export class SQSComponent implements OnInit {
+export class SQSComponent {
 
   public queueList$: Observable<string[]>;
   public activeQueue: string;
@@ -23,13 +23,10 @@ export class SQSComponent implements OnInit {
   constructor(private _sqsService: SqsService) {
     this.queueList$ = this._sqsService.getQueueList();
     this.activeQueue = '';
-    this.queueUrl = 'http://localhost:4566/000000000000/';
+    this.queueUrl = '';
     this.message = '';
     this.sendStatus = EventStatus.PENDING;
     this.queueMessages = [];
-  }
-
-  ngOnInit(): void {
   }
 
   tabChanged(event: MdbTabChange): void {
@@ -42,6 +39,7 @@ export class SQSComponent implements OnInit {
   }
 
   parseQueueName(queue: string) {
+    this.queueUrl = queue.split('/').slice(0,4).join('/') + '/';
     return queue.split('/')[ 4 ];
   }
 
