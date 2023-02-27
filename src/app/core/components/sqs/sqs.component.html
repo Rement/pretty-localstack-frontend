@@ -1,3 +1,22 @@
+<div class="input-group m-b-10 m-t-10">
+  <input type="text"
+         class="form-control"
+         placeholder="New queue name"
+         [(ngModel)]="newQueueName"/>
+  <button class="btn btn-outline-primary"
+          type="button"
+          data-mdb-ripple-color="dark"
+          (click)="createQueue(newQueueName)">
+    Create
+  </button>
+  <button class="btn btn-outline-danger"
+          type="button"
+          data-mdb-ripple-color="dark"
+          (click)="deleteQueue(activeQueue)">
+    Delete {{activeQueue}}
+  </button>
+</div>
+
 <ng-container *ngIf="queueList$ | async as queueList; else loading">
   <mdb-tabs [vertical]="true"
             [pills]="true"
@@ -13,7 +32,6 @@
     <div *ngTemplateOutlet="loading"></div>
   </ng-container>
 </ng-container>
-
 <ng-template #tabContent>
   <div class="row m-t-10 queue-info-box" *ngIf="queueAttributes">
     <div class="col-md-4">
@@ -85,9 +103,11 @@
     <div>
       <ul class="list-group list-group-light">
         <li class="list-group-item" *ngFor="let message of queueMessages">
-          <div class="col-md-12">
-            <span class="m-l-10 attribute-name">MessageId:</span>
-            <span class="m-l-10">{{message?.messageId}}</span>
+          <div class="col-md-12 d-flex align-items-center m-b-10 justify-content-between">
+            <div>
+              <span class="m-l-10 attribute-name">MessageId:</span>
+              <span class="m-l-10">{{message?.messageId}}</span>
+            </div>
           </div>
           <textarea class="form-control" id="receiveMessageTextArea"
                     rows="5"
