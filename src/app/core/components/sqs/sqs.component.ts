@@ -14,6 +14,8 @@ export class SQSComponent implements OnInit {
   public queueList$: Observable<string[]>;
   public newQueueName: string;
   public deleteCandidate: string;
+  public messageToSend: string;
+  public selectedQueue: string;
 
   /*  public activeQueue: string;
     public queueUrl: string;
@@ -30,6 +32,8 @@ export class SQSComponent implements OnInit {
     this.queueList$ = this.getQueueList();
     this.newQueueName = '';
     this.deleteCandidate = '';
+    this.messageToSend = '';
+    this.selectedQueue = '';
     /*this.activeQueue = '';
     this.queueUrl = '';
     this.message = '';
@@ -62,6 +66,18 @@ export class SQSComponent implements OnInit {
     });
   }
 
+  sendMessage() {
+    this._sqsMessageService.sendMessage(this.selectedQueue, this.messageToSend)
+      .subscribe((result) => {
+        if (result.sdkHttpMetadata.httpStatusCode === 200) {
+          this.messageToSend = '';
+          this.openSnackBar('Message was successfully sent')
+        } else {
+          this.openSnackBar('Something went wrong during sending')
+        }
+      });
+  }
+
 
   /*tabChanged(event: any): void {
     this.activeQueue = event.tab.title;
@@ -80,17 +96,7 @@ export class SQSComponent implements OnInit {
       .subscribe((messages) => this.queueMessages.push(...messages));
   }
 
-  sendMessage() {
-    this._sqsMessageService.sendMessage(this.activeQueue, this.message)
-      .subscribe((result) => {
-        if (result.sdkHttpMetadata.httpStatusCode === 200) {
-          this.message = '';
-          this.sendStatus = EventStatus.SUCCESS;
-        } else {
-          this.sendStatus = EventStatus.ERROR;
-        }
-      });
-  }*/
+  */
 
   /*cleanStatus(event: string) {
     if (event.length === 1) {
