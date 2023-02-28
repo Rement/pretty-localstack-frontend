@@ -1,25 +1,19 @@
-a.nav-link {
-  text-align: left!important;
+.sqs {
+  margin: 20px;
 }
 
-.queue-info-box {
-  background-color: #0abab53d;
-  border-radius: 0.25rem;
+.mat-expansion-panel-header {
+  font-size: 20px;
+}
 
-  & > div {
-    padding: 10px;
+form {
+  &.create-queue-form > mat-form-field {
+    width: 100%;
   }
-}
-
-.attribute-name {
-  font-style: italic;
-  font-weight: bold;
-}
-
-.attribute-value {
-  float: right;
-}
-
-.list-group-item.ng-star-inserted {
-  background-color: #0abab53d;
+  &.d-flex {
+    align-items: flex-start;
+    > button {
+      height: 55px;
+    }
+  }
 }

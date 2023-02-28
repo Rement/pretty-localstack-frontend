@@ -1,0 +1,66 @@
+<div class="sqs">
+  <mat-accordion [multi]="true">
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Manage
+        </mat-panel-title>
+        <mat-panel-description>
+          Create, delete queues
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-container *ngTemplateOutlet="manage_sqs"></ng-container>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Discover
+        </mat-panel-title>
+        <mat-panel-description>
+          Queue details, messages
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div></div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>
+
+<ng-template #manage_sqs>
+  <div class="row">
+    <form class="col-md-6 create-queue-form d-flex">
+      <mat-form-field>
+        <mat-label>Queue name</mat-label>
+        <input matInput
+               placeholder="Queue name"
+               [(ngModel)]="newQueueName"
+               [ngModelOptions]="{standalone: true}">
+      </mat-form-field>
+      <button mat-button
+              matSuffix
+              mat-stroked-button
+              aria-label="create-queue"
+              (click)="createQueue(newQueueName)">
+        Create
+      </button>
+    </form>
+    <form class="col-md-6 create-queue-form d-flex">
+      <mat-form-field appearance="fill">
+        <mat-label>Queue list</mat-label>
+        <mat-select [(value)]="deleteCandidate">
+          <mat-option></mat-option>
+          <mat-option *ngFor="let queue of queueList$ | async; let i = index"
+                      [value]="queue">
+            {{ parseQueueName(queue) }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-button
+              matSuffix
+              mat-stroked-button
+              aria-label="delete-queue"
+              (click)="deleteQueue(deleteCandidate)">
+        Delete
+      </button>
+    </form>
+  </div>
+</ng-template>
