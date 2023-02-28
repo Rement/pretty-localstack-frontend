@@ -1,49 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { SqsQueueService } from '../../services/sqs-queue.service';
 import { Observable } from 'rxjs';
 import { SqsMessageService } from '../../services/sqs-message.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatOptionSelectionChange } from '@angular/material/core';
+import { MessageModel } from '../../../shared/models/message.model';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-sqs',
   templateUrl: './sqs.component.html',
   styleUrls: ['./sqs.component.scss']
 })
-export class SQSComponent implements OnInit {
+export class SQSComponent {
 
   public queueList$: Observable<string[]>;
   public newQueueName: string;
-  public deleteCandidate: string;
   public messageToSend: string;
   public selectedQueue: string;
-
-  /*  public activeQueue: string;
-    public queueUrl: string;
-    public queueAttributes!: any;
-    public message: any;
-    public sendStatus: EventStatus;
-    public queueMessages: MessageModel[];
-    public newQueueName: string;
-    panelOpenState = false;*/
+  public queueAttributes!: any;
+  public queueMessages: MessageModel[];
 
   constructor(private _sqsQueueService: SqsQueueService,
               private _sqsMessageService: SqsMessageService,
-              private _snackBar: MatSnackBar) {
+              private _snackBar: MatSnackBar,
+              private _dialog: MatDialog) {
     this.queueList$ = this.getQueueList();
     this.newQueueName = '';
-    this.deleteCandidate = '';
     this.messageToSend = '';
     this.selectedQueue = '';
-    /*this.activeQueue = '';
-    this.queueUrl = '';
-    this.message = '';
-    this.sendStatus = EventStatus.PENDING;
     this.queueMessages = [];
-    this.newQueueName = '';*/
-  }
-
-
-  ngOnInit(): void {
   }
 
   parseQueueName(queue: string) {
@@ -59,10 +46,21 @@ export class SQSComponent implements OnInit {
   }
 
   deleteQueue(queueUrl: string): void {
-    this._sqsQueueService.deleteQueue(queueUrl).subscribe(() => {
-      this.deleteCandidate = '';
-      this.queueList$ = this.getQueueList();
-      this.openSnackBar('Queue \'' + this.parseQueueName(queueUrl) + '\' was deleted');
+    const openDialog: MatDialogRef<any> = this._dialog.open(ConfirmDialogComponent, {
+      data: {
+        queueUrl: queueUrl,
+        queueName: this.parseQueueName(queueUrl)
+      }
+    });
+
+    openDialog.afterClosed().subscribe((result) => {
+      if (result === 'delete') {
+        this._sqsQueueService.deleteQueue(queueUrl).subscribe(() => {
+          this.selectedQueue = '';
+          this.queueList$ = this.getQueueList();
+          this.openSnackBar('Queue \'' + this.parseQueueName(queueUrl) + '\' was deleted');
+        });
+      }
     });
   }
 
@@ -78,38 +76,32 @@ export class SQSComponent implements OnInit {
       });
   }
 
-
-  /*tabChanged(event: any): void {
-    this.activeQueue = event.tab.title;
-    this._sqsQueueService.getQueueInfo(this.queueUrl + this.activeQueue)
-      .subscribe(info => this.queueAttributes = info.attributes)
-    this.message = '';
-    this.sendStatus = EventStatus.PENDING;
-    this.queueMessages = [];
-  }
-
-  */
-
-  /*receiveMessages() {
-    const fullQueueUrl: string = this.queueUrl + this.activeQueue;
-    this._sqsMessageService.getMessages(fullQueueUrl)
-      .subscribe((messages) => this.queueMessages.push(...messages));
-  }
-
-  */
-
-  /*cleanStatus(event: string) {
-    if (event.length === 1) {
-      this.sendStatus = EventStatus.PENDING;
+  public retrieveQueueAttributes(event: MatOptionSelectionChange) {
+    if (!event.isUserInput) {
+      return;
     }
+    const queueUrl: string = event.source.value;
+    this._sqsQueueService.getQueueInfo(queueUrl)
+      .subscribe(info => {
+        this.messageToSend = '';
+        this.queueAttributes = info.attributes;
+        this.queueMessages = [];
+      })
   }
 
-  deleteMessage(queueName: string, receiptHandler: string) {
-    this._sqsMessageService.deleteMessage(this.queueUrl + queueName, receiptHandler)
-      .subscribe(() => {
-        this.receiveMessages();
-      })
-  }*/
+  public retrieveMessages() {
+    this._sqsMessageService.getMessages(this.selectedQueue)
+      .subscribe((messages) => {
+        console.log(messages);
+        this.queueMessages.push(...messages)
+      });
+  }
+
+  public deleteMessage(itemIndex: number, message: MessageModel) {
+    this._sqsMessageService.deleteMessage(this.selectedQueue, message.receiptHandle).subscribe(() => {
+      this.queueMessages.splice(itemIndex, 1);
+    })
+  }
 
   private openSnackBar(message: string) {
     this._snackBar.open(message, '', {

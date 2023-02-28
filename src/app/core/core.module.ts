@@ -10,6 +10,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+import { ConfirmDialogComponent } from '../shared/components/confirm-dialog/confirm-dialog.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 
 @NgModule({
@@ -26,7 +29,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSelectModule,
     MatSnackBarModule,
     MatListModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatIconModule,
+    MatDialogModule
+  ],
+  providers: [
+    ConfirmDialogComponent
   ]
 })
-export class CoreModule { }
+export class CoreModule {
+}

@@ -7,21 +7,28 @@
 }
 
 form {
-  &.create-queue-form > mat-form-field {
-    width: 100%;
-  }
   &.d-flex {
     align-items: flex-start;
+
     > button {
       height: 55px;
     }
   }
 }
 
-.example-full-width {
-  width: 100%;
-}
-
 .card-title {
   font-size: 16px;
+}
+
+.attribute-name {
+  font-style: italic;
+  font-weight: bold;
+}
+
+.attribute-value {
+  float: right;
+}
+
+div.attributes > span:nth-child(2) {
+  margin-left: 10px;
 }

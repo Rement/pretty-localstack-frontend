@@ -3,10 +3,10 @@
     <mat-expansion-panel [expanded]="true">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          Manage
+          Manage queues
         </mat-panel-title>
         <mat-panel-description>
-          Create, delete queues
+          Get queue attributes. Ability to delete queues
         </mat-panel-description>
       </mat-expansion-panel-header>
       <ng-container *ngTemplateOutlet="manage_sqs"></ng-container>
@@ -14,10 +14,18 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          Discover
+          Create queue
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <ng-container *ngTemplateOutlet="create_queue"></ng-container>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Discover queues
         </mat-panel-title>
         <mat-panel-description>
-          Queue details, messages
+          Send / Receive messages
         </mat-panel-description>
       </mat-expansion-panel-header>
       <ng-container *ngTemplateOutlet="discover_sqs"></ng-container>
@@ -26,83 +34,156 @@
 </div>
 
 <ng-template #manage_sqs>
-  <div class="row">
-    <form class="col-md-6 create-queue-form d-flex">
-      <mat-form-field>
-        <mat-label>Queue name</mat-label>
-        <input matInput
-               placeholder="Queue name"
-               [(ngModel)]="newQueueName"
-               [ngModelOptions]="{standalone: true}">
-      </mat-form-field>
-      <button mat-button
-              matSuffix
-              mat-stroked-button
-              aria-label="create-queue"
-              (click)="createQueue(newQueueName)">
-        Create
-      </button>
-    </form>
-    <form class="col-md-6 create-queue-form d-flex">
-      <mat-form-field appearance="fill">
-        <mat-label>Queue list</mat-label>
-        <mat-select [(value)]="deleteCandidate">
-          <mat-option></mat-option>
-          <mat-option *ngFor="let queue of queueList$ | async; let i = index"
-                      [value]="queue">
-            {{ parseQueueName(queue) }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <button mat-button
-              matSuffix
-              mat-stroked-button
-              aria-label="delete-queue"
-              (click)="deleteQueue(deleteCandidate)">
-        Delete
-      </button>
-    </form>
-  </div>
-</ng-template>
-<ng-template #discover_sqs>
-  <div class="row">
+  <form class="col-md-12 queue-form d-flex">
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Queue list</mat-label>
+      <mat-select [(value)]="selectedQueue">
+        <mat-option></mat-option>
+        <mat-option *ngFor="let queue of queueList$ | async; let i = index"
+                    [value]="queue"
+                    (onSelectionChange)="retrieveQueueAttributes($event)">
+          {{ parseQueueName(queue) }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+  <div class="row" *ngIf="queueAttributes !== null">
     <div class="col-md-4">
-      <mat-selection-list role="list" [multiple]="false">
-        <mat-list-option role="listitem"
-                         *ngFor="let queue of queueList$ | async; let i = index">
-          {{parseQueueName(queue)}}
-        </mat-list-option>
-      </mat-selection-list>
-    </div>
-    <div class="col-md-8">
       <div class="row">
-        <div class="col-md-12"><span class="card-title">Send message</span></div>
         <div class="col-md-12">
-          <mat-form-field class="example-full-width">
-            <mat-label>Message body</mat-label>
-            <textarea matInput
-                      id="sendMessageTextArea"
-                      rows="4"
-                      appTextareaAutosize
-                      [minRows]="4"
-                      [maxRows]="40"
-                      [(ngModel)]="messageToSend">
-              </textarea>
-          </mat-form-field>
+          <span class="attribute-name">ApproximateNumberOfMessages:</span>
+          <span class="attribute-value">{{queueAttributes?.ApproximateNumberOfMessages}}</span>
         </div>
-        <div class="col-md-12" matTooltip="First, select queue from list">
-          <button mat-raised-button
-                  color="primary"
-                  class="float-end"
-                  [disabled]="selectedQueue === ''"
-                  (click)="sendMessage()">
-            Send
-          </button>
+        <div class="col-md-12">
+          <span class="attribute-name">ApproximateNumberOfMessagesDelayed:</span>
+          <span class="attribute-value">{{queueAttributes?.ApproximateNumberOfMessagesDelayed}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">ApproximateNumberOfMessagesNotVisible:</span>
+          <span class="attribute-value">{{queueAttributes?.ApproximateNumberOfMessagesNotVisible}}</span>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="col-md-12"><span class="card-title">Receive messages</span></div>
-        <div class="col-md-12">ffff</div>
+    </div>
+    <div class="col-md-4">
+      <div class="row">
+        <div class="col-md-12">
+          <span class="attribute-name">MaximumMessageSize:</span>
+          <span class="attribute-value">{{queueAttributes?.MaximumMessageSize}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">MessageRetentionPeriod:</span>
+          <span class="attribute-value">{{queueAttributes?.MessageRetentionPeriod}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">VisibilityTimeout:</span>
+          <span class="attribute-value">{{queueAttributes?.VisibilityTimeout}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="row">
+        <div class="col-md-12">
+          <span class="attribute-name">DelaySeconds:</span>
+          <span class="attribute-value">{{queueAttributes?.DelaySeconds}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">ReceiveMessageWaitTimeSeconds:</span>
+          <span class="attribute-value">{{queueAttributes?.ReceiveMessageWaitTimeSeconds}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">SqsManagedSseEnabled:</span>
+          <span class="attribute-value">{{queueAttributes?.SqsManagedSseEnabled}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12 mt-3" [matTooltip]="selectedQueue === '' ? 'First, select queue from list' : ''">
+    <button matSuffix
+            mat-raised-button
+            aria-label="delete-queue"
+            class="float-end"
+            color="warn"
+            [disabled]="selectedQueue === ''"
+            (click)="deleteQueue(selectedQueue)">
+      Delete
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #create_queue>
+  <form class="col-md-12 queue-form d-flex">
+    <mat-form-field class="w-100">
+      <mat-label>Queue name</mat-label>
+      <input matInput
+             placeholder="Queue name"
+             [(ngModel)]="newQueueName"
+             [ngModelOptions]="{standalone: true}">
+    </mat-form-field>
+    <button mat-raised-button
+            color="primary"
+            (click)="createQueue(newQueueName)">
+      Create
+    </button>
+  </form>
+</ng-template>
+
+<ng-template #discover_sqs>
+  <div class="row">
+    <div class="col-md-4" [matTooltip]="selectedQueue === '' ? 'First, select queue from list' : ''">
+      <div class="col-md-12"><span class="card-title">Send message</span></div>
+      <div class="col-md-12">
+        <mat-form-field class="w-100">
+          <mat-label>Message body</mat-label>
+          <textarea matInput
+                    id="sendMessageTextArea"
+                    rows="4"
+                    appTextareaAutosize
+                    [minRows]="4"
+                    [maxRows]="40"
+                    [(ngModel)]="messageToSend">
+              </textarea>
+        </mat-form-field>
+      </div>
+      <div class="col-md-12">
+        <button matSuffix
+                mat-raised-button
+                aria-label="send-message"
+                class="float-end"
+                color="primary"
+                [disabled]="selectedQueue === ''"
+                (click)="sendMessage()">
+          Send
+        </button>
+      </div>
+    </div>
+    <div class="col-md-8" [matTooltip]="selectedQueue === '' ? 'First, select queue from list' : ''">
+      <button matSuffix
+              mat-raised-button
+              aria-label="retrieve-message"
+              color="primary"
+              class="w-100"
+              [disabled]="selectedQueue === ''"
+              (click)="retrieveMessages()">
+        Retrieve messages
+      </button>
+      <div class="col-md-12 mt-3" *ngFor="let message of queueMessages; let i = index">
+        <div class="col-md-12 d-flex align-items-center mb-2 justify-content-between">
+          <div class="attributes">
+            <span class="attribute-name">MessageId:</span>
+            <span class="ml-2">{{message?.messageId}}</span>
+          </div>
+          <button mat-icon-button
+                  aria-label="Delete message"
+                  color="warn"
+                  (click)="deleteMessage(i, message)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+        <textarea class="form-control" id="receiveMessageTextArea"
+                  rows="5"
+                  readonly
+                  [ngModel]="message.body | json">
+          </textarea>
       </div>
     </div>
   </div>
