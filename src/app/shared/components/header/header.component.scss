@@ -12,3 +12,11 @@
     width: 100px;
   }
 }
+
+div.statuses {
+  flex-direction: column;
+
+  & > div > span:nth-child(2) {
+    float: right;
+  }
+}

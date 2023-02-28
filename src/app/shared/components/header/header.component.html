@@ -4,6 +4,20 @@
       <div class="logo">
         <mat-icon [svgIcon]="'localstackui'"></mat-icon>
       </div>
+      <div class="statuses d-flex ml-10">
+        <div>
+          <span>Server: </span>
+          <span *ngIf="isServerUp">UP</span>
+          <span *ngIf="!isServerUp">UNKNOWN</span>
+        </div>
+        <div>
+          <span>SQS: </span>
+          <span *ngIf="isServerUp && isSQSUp">UP</span>
+          <span *ngIf="isServerUp && !isSQSUp">DOWN</span>
+          <span *ngIf="!isServerUp">UNKNOWN</span>
+        </div>
+        <div>Last update: {{lastUpdateTime | date: 'mediumTime'}}</div>
+      </div>
     </mat-toolbar>
   </div>
 </header>
