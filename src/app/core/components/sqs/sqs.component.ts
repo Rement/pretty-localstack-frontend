@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { SqsQueueService } from '../../services/sqs-queue.service';
 import { Observable } from 'rxjs';
-import { MdbTabChange } from 'mdb-angular-ui-kit/tabs/tabs.component';
 import { EventStatus } from '../../../shared/models/event-message.model';
 import { MessageModel } from '../../../shared/models/message.model';
 import { SqsMessageService } from '../../services/sqs-message.service';
@@ -33,7 +32,7 @@ export class SQSComponent {
     this.newQueueName = '';
   }
 
-  tabChanged(event: MdbTabChange): void {
+  tabChanged(event: any): void {
     this.activeQueue = event.tab.title;
     this._sqsQueueService.getQueueInfo(this.queueUrl + this.activeQueue)
       .subscribe(info => this.queueAttributes = info.attributes)
