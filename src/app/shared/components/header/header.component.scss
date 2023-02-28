@@ -1,0 +1,22 @@
+.toolbar {
+  height: 98px;
+}
+
+.logo {
+  margin-top: 12px;
+  margin-left: -6px;
+
+  .mat-icon {
+    font-size: 100px;
+    height: 100px;
+    width: 100px;
+  }
+}
+
+div.statuses {
+  flex-direction: column;
+
+  & > div > span:nth-child(2) {
+    float: right;
+  }
+}

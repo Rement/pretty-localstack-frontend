@@ -1,14 +1,23 @@
-a.nav-link {
-  text-align: left!important;
+.sqs {
+  margin: 20px;
 }
 
-.queue-info-box {
-  background-color: #0abab53d;
-  border-radius: 0.25rem;
+.mat-expansion-panel-header {
+  font-size: 20px;
+}
 
-  & > div {
-    padding: 10px;
+form {
+  &.d-flex {
+    align-items: flex-start;
+
+    > button {
+      height: 55px;
+    }
   }
+}
+
+.card-title {
+  font-size: 16px;
 }
 
 .attribute-name {
@@ -20,6 +29,6 @@ a.nav-link {
   float: right;
 }
 
-.list-group-item.ng-star-inserted {
-  background-color: #0abab53d;
+div.attributes > span:nth-child(2) {
+  margin-left: 10px;
 }

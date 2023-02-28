@@ -1,43 +1,53 @@
-<div class="input-group m-b-10 m-t-10">
-  <input type="text"
-         class="form-control"
-         placeholder="New queue name"
-         [(ngModel)]="newQueueName"/>
-  <button class="btn btn-outline-primary"
-          type="button"
-          data-mdb-ripple-color="dark"
-          (click)="createQueue(newQueueName)">
-    Create
-  </button>
-  <button class="btn btn-outline-danger"
-          type="button"
-          data-mdb-ripple-color="dark"
-          (click)="deleteQueue(activeQueue)">
-    Delete {{activeQueue}}
-  </button>
+<div class="m-3">
+  <mat-accordion [multi]="true">
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Manage queues
+        </mat-panel-title>
+        <mat-panel-description>
+          Get queue attributes. Ability to delete queues
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-container *ngTemplateOutlet="manage_sqs"></ng-container>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Create queue
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <ng-container *ngTemplateOutlet="create_queue"></ng-container>
+    </mat-expansion-panel>
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Discover queues
+        </mat-panel-title>
+        <mat-panel-description>
+          Send / Receive messages
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <ng-container *ngTemplateOutlet="discover_sqs"></ng-container>
+    </mat-expansion-panel>
+  </mat-accordion>
 </div>
 
-<ng-container *ngIf="queueList$ | async as queueList; else loading">
-  <mdb-tabs [vertical]="true"
-            [pills]="true"
-            [navColumnClass]="'col-4'"
-            [contentColumnClass]="'col-8'"
-            (activeTabChange)="tabChanged($event)">
-    <mdb-tab *ngFor="let queue of queueList; index as i"
-             [title]="parseQueueName(queue)">
-      <div class="container-fluid" *ngTemplateOutlet="tabContent"></div>
-    </mdb-tab>
-  </mdb-tabs>
-  <ng-container *ngIf="queueList.length === 0">
-    <div *ngTemplateOutlet="loading"></div>
-  </ng-container>
-</ng-container>
-<ng-template #tabContent>
-  <div class="row m-t-10 queue-info-box" *ngIf="queueAttributes">
-    <div class="col-md-4">
-      <div><span class="attribute-name">Queue name:</span></div>
-      <div>{{activeQueue}}</div>
-    </div>
+<ng-template #manage_sqs>
+  <form class="col-md-12 queue-form d-flex">
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Queue list</mat-label>
+      <mat-select [(value)]="selectedQueue">
+        <mat-option></mat-option>
+        <mat-option *ngFor="let queue of queueList$ | async; let i = index"
+                    [value]="queue"
+                    (onSelectionChange)="retrieveQueueAttributes($event)">
+          {{ parseQueueName(queue) }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
+  <div class="row" *ngIf="queueAttributes !== null">
     <div class="col-md-4">
       <div class="row">
         <div class="col-md-12">
@@ -50,7 +60,7 @@
         </div>
         <div class="col-md-12">
           <span class="attribute-name">ApproximateNumberOfMessagesNotVisible:</span>
-          <span class="attribute-value">{{queueAttributes.ApproximateNumberOfMessagesNotVisible}}</span>
+          <span class="attribute-value">{{queueAttributes?.ApproximateNumberOfMessagesNotVisible}}</span>
         </div>
       </div>
     </div>
@@ -62,68 +72,119 @@
         </div>
         <div class="col-md-12">
           <span class="attribute-name">MessageRetentionPeriod:</span>
-          <span class="attribute-value">{{queueAttributes.MessageRetentionPeriod}}</span>
+          <span class="attribute-value">{{queueAttributes?.MessageRetentionPeriod}}</span>
         </div>
         <div class="col-md-12">
           <span class="attribute-name">VisibilityTimeout:</span>
-          <span class="attribute-value">{{queueAttributes.VisibilityTimeout}}</span>
+          <span class="attribute-value">{{queueAttributes?.VisibilityTimeout}}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="row">
+        <div class="col-md-12">
+          <span class="attribute-name">DelaySeconds:</span>
+          <span class="attribute-value">{{queueAttributes?.DelaySeconds}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">ReceiveMessageWaitTimeSeconds:</span>
+          <span class="attribute-value">{{queueAttributes?.ReceiveMessageWaitTimeSeconds}}</span>
+        </div>
+        <div class="col-md-12">
+          <span class="attribute-name">SqsManagedSseEnabled:</span>
+          <span class="attribute-value">{{queueAttributes?.SqsManagedSseEnabled}}</span>
         </div>
       </div>
     </div>
   </div>
-  <div class="row m-t-10 queue-info-box">
-    <form>
-      <div class="form-outline">
-        <textarea class="form-control" id="sendMessageTextArea" rows="4"
-                  appTextareaAutosize
-                  [minRows]="4"
-                  [maxRows]="40"
-                  [(ngModel)]="message"
-                  (ngModelChange)="cleanStatus($event)"
-                  [ngModelOptions]="{standalone: true}">
-        </textarea>
-        <label class="form-label" for="sendMessageTextArea">Message</label>
-      </div>
-      <div class="d-flex align-items-center m-b-10">
-        <button type="button" class="btn btn-primary"
-                (click)="sendMessage()">Send
-        </button>
-        <div class="m-l-10 success" *ngIf="sendStatus === 0"><i class="fas fa-check"></i> Success</div>
-        <div class="m-l-10 danger" *ngIf="sendStatus === 1"><i class="fas fa-times"></i> Fail</div>
-      </div>
-    </form>
-  </div>
-  <div class="row m-t-10 queue-info-box">
-    <div>
-      <button class="btn btn-primary"
-              (click)="receiveMessages()">
-        Receive messages
-      </button>
-    </div>
-    <div>
-      <ul class="list-group list-group-light">
-        <li class="list-group-item" *ngFor="let message of queueMessages">
-          <div class="col-md-12 d-flex align-items-center m-b-10 justify-content-between">
-            <div>
-              <span class="m-l-10 attribute-name">MessageId:</span>
-              <span class="m-l-10">{{message?.messageId}}</span>
-            </div>
-          </div>
-          <textarea class="form-control" id="receiveMessageTextArea"
-                    rows="5"
-                    readonly
-                    [ngModel]="message.body | json">
-          </textarea>
-        </li>
-      </ul>
-    </div>
+  <div class="col-md-12 mt-3" [matTooltip]="selectedQueue === '' ? 'First, select queue from list' : ''">
+    <button matSuffix
+            mat-raised-button
+            aria-label="delete-queue"
+            class="float-end"
+            color="warn"
+            [disabled]="selectedQueue === ''"
+            (click)="deleteQueue(selectedQueue)">
+      Delete
+    </button>
   </div>
 </ng-template>
 
-<ng-template #loading>
-  <div class="container-fluid m-t-10 navbar">
-    <div class="row m-l-10">
-      Not queues found. Please, check localstack SQS status or apply sqs config (i.e. terraform)
+<ng-template #create_queue>
+  <form class="col-md-12 queue-form d-flex">
+    <mat-form-field class="w-100">
+      <mat-label>Queue name</mat-label>
+      <input matInput
+             placeholder="Queue name"
+             [(ngModel)]="newQueueName"
+             [ngModelOptions]="{standalone: true}">
+    </mat-form-field>
+    <button mat-raised-button
+            color="primary"
+            (click)="createQueue(newQueueName)">
+      Create
+    </button>
+  </form>
+</ng-template>
+
+<ng-template #discover_sqs>
+  <div class="row">
+    <div class="col-md-4" [matTooltip]="selectedQueue === '' ? 'First, select queue from list' : ''">
+      <div class="col-md-12"><span class="card-title">Send message</span></div>
+      <div class="col-md-12">
+        <mat-form-field class="w-100">
+          <mat-label>Message body</mat-label>
+          <textarea matInput
+                    id="sendMessageTextArea"
+                    rows="4"
+                    appTextareaAutosize
+                    [minRows]="4"
+                    [maxRows]="40"
+                    [(ngModel)]="messageToSend">
+              </textarea>
+        </mat-form-field>
+      </div>
+      <div class="col-md-12">
+        <button matSuffix
+                mat-raised-button
+                aria-label="send-message"
+                class="float-end"
+                color="primary"
+                [disabled]="selectedQueue === ''"
+                (click)="sendMessage()">
+          Send
+        </button>
+      </div>
+    </div>
+    <div class="col-md-8" [matTooltip]="selectedQueue === '' ? 'First, select queue from list' : ''">
+      <button matSuffix
+              mat-raised-button
+              aria-label="retrieve-message"
+              color="primary"
+              class="w-100"
+              [disabled]="selectedQueue === ''"
+              (click)="retrieveMessages()">
+        Retrieve messages
+      </button>
+      <div class="col-md-12 mt-3" *ngFor="let message of queueMessages; let i = index">
+        <div class="col-md-12 d-flex align-items-center mb-2 justify-content-between">
+          <div class="attributes">
+            <span class="attribute-name">MessageId:</span>
+            <span class="ml-2">{{message?.messageId}}</span>
+          </div>
+          <button mat-icon-button
+                  aria-label="Delete message"
+                  color="warn"
+                  (click)="deleteMessage(i, message)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+        <textarea class="form-control" id="receiveMessageTextArea"
+                  rows="5"
+                  readonly
+                  [ngModel]="message.body | json">
+          </textarea>
+      </div>
     </div>
   </div>
 </ng-template>

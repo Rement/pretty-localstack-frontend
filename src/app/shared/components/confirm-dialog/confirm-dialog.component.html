@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>Delete SQS</h1>
+<div mat-dialog-content>
+  Do you want to delete queue: {{data.queueName}}
+</div>
+<div mat-dialog-actions class="d-flex justify-content-center">
+  <button mat-button
+          color="warn"
+          (click)="confirm()">Delete
+  </button>
+</div>

@@ -1,47 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
-@import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
-@import '../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
-@import '../node_modules/@fortawesome/fontawesome-free/scss/regular.scss';
-@import '../node_modules/@fortawesome/fontawesome-free/scss/brands.scss';
+@import "~bootstrap/dist/css/bootstrap.css";
 
-@import '../node_modules/mdb-angular-ui-kit/assets/scss/mdb.scss';
-
-
-.danger {
-  color: #DC4C64;
+html, body {
+  height: 100%;
 }
 
-.success {
-  color: #14A44D;
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-
-.primary {
-  color: #3B71CA;
-}
-
-.warning {
-  color: #E4A11B;
-}
-
-a.nav-link {
-  font-size: 16px !important;
-  text-align: left;
-}
-
-.m-t-10 {
-  margin-top: 10px;
-}
-
-.m-b-10 {
-  margin-bottom: 10px;
-}
-
-.m-l-10 {
-  margin-left: 10px;
-}
-
-.m-r-10 {
-  margin-right: 10px;
-}
-
-
